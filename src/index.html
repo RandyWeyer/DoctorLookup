@@ -1,10 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
-  <body>
+<head>
+  <title>Doctor Lookup</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+</head>
+<body>
+  <!-- Beginning of navbar -->
 
-  </body>
-</html>
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+
+      <div>
+        <ul class="nav navbar-nav navbar-left">
+          <li class="active"><a href="index.html">Home</a> </li>
+          </ul>
+
+        </div>
+      </nav>
+
+      <!-- End of navbar -->
+
+      <!-- Beginning of container -->
+      <div class="container">
+        <div class="jumbotron">
+          <h1>Doctor Lookup</h1>
+        </div>
+
+        <!-- Query form -->
+        <form id="inputForm">
+          <div class="form-group">
+            <label for="name">Search doctors by name:</label>
+            <small>Search by a name keyword: (e.g. 'Lupton')</small>
+            <input class="w-50 form-control" id="name" type="text">
+          </div>
+          <div class="form-group">
+            <label for="query">Search doctors by medical query:</label>
+            <small>Search by a keyword query: (e.g. 'Toothache')</small>
+            <input class="w-50 form-control" id="query" type="text">
+            <br>
+          </div>
+          <button class="btn btn-info" type="submit" name="button">Submit</button>
+        </form>
+        <div id="statusError"></div>
+        <div id="postError"></div>
+        <!-- End of query form -->
+
+        <!-- Output into a datatable -->
+        <table id="table_id" class="display">
+          <thead>
+            <tr>
+              <th>Column 1</th>
+              <th>Column 2</th>
+            </tr>
+          </thead>
+          <tbody id="results">
+
+          </tbody>
+        </table>
+
+
+      </div>
+      <!-- End of container -->
+
+    </body>
+    </html>
