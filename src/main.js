@@ -1,65 +1,129 @@
 import $ from 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-// require( 'datatables.net-dt' )();
-
+import { Doctor } from './../src/doctorLookup.js';
+import 'datatables.net/js/jquery.dataTables.min.js';
 
 $(document).ready(function() {
-  $('#postError').hide();
-  $('#results').hide();
+     $('#output').dataTable( {
+        "scrollCollapse": true,
+        "info":           true,
+        "paging":         true
+    } );
+} );
 
-  $('#inputForm').submit(function(event) {
-    event.preventDefault();
+$(function () {
+  let newDoctor = new Doctor();
+  let specialPromise = newDoctor.getAllSpecialties();
 
-    if ( $.fn.DataTable.isDataTable( '#results' ) ) {
-      $("#results").DataTable().clear();
-      $('#results').DataTable().destroy();
+  specialPromise.then(function (response){
+    let speciality = JSON.parse(response);
+    for(let i = 0; i < speciality.data.length; i++){
+      $("#specialty").append(`<option value = "${speciality.data[i].uid}">`+
+      `${speciality.data[i].name}`
+    +"</option>");
     }
+  }, function(error) {
+    $("#error").html("<p>"+`There was an Error:${error.message}`+"</p>");
+  });
+  //click to search by  specialty
+  $("#bySpecialty").click(function(){
+    $("#output").empty();
+    let input = $("#specialty").val();
+    let newDoctor = new Doctor();
+    let findDoc = newDoctor.findDoctorBySpecialty(input);
 
-    let name = $("#name").val();
-    let query = $("#query").val();
-    $("#name").val("");
-    $("#query").val("");
-
-    let request = new XMLHttpRequest();
-    let url = `https://api.betterdoctor.com/2016-03-01/doctors?name=${name}&query=${query}&location=47.6062%2C-122.3321%2C100&sort=rating-desc&skip=0&limit=50&user_key=${process.env.API_KEY}`;
-
-
-    request.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
-        let response = JSON.parse(this.responseText);
-        getElements(response);
-      } else if (this.readyState === 4 && this.status !== 200) {
-        $("#statusError").text('There is a problem with your request, please try again.');
+    findDoc.then(function (response) {
+      let doctor = JSON.parse(response);
+      if (doctor.data.length != 0) {
+        for (let i = 0; i < doctor.data.length; i++) {
+          $("#output").append("<tr>" +
+            '<td>' + doctor.data[i].profile.first_name + " " + doctor.data[i].profile.last_name + '(' + doctor.data[i].profile.gender + ')' + '</td>' +
+            '<td>' + doctor.data[i].practices[0].phones[0].number + '</td>' +
+            '<td>' + doctor.data[i].practices[0].visit_address.street + '</td>' +
+            '<td>' + doctor.data[i].practices[0].visit_address.city + "," +
+            doctor.data[i].practices[0].visit_address.state + " " +
+            doctor.data[i].practices[0].visit_address.zip +
+            '</td>' +
+            '<td>' + "Taking New Patients: " + doctor.data[i].practices[0].accepts_new_patients + '</td>' +
+            "</div>"
+          );
+        }
+        $('#output').dataTable();
       } else {
-        $("#statusError").text('Please wait, request is processing.');
+        $("#output").append("<p>" + "No Doctors Meet Criteria" + "</p>");
       }
-    }
+    }, function (error) {
+      $("#error").html("<p>"+`There was an Error: ${error.message}`+"</p>");
+    });
 
-    // open get request
-    request.open("GET", url, true);
-    request.send();
+  });
+  //click to search by Key Word
+  $("#bykeyWord").click(function () {
+    $("#output").empty();
+    let input = $("#userInput").val();
+    $("#userInput").val("");
 
-    // post response
-    let getElements = function(response) {
-      if (response.data != "") {
-        response.data.forEach(function(info) {
-          $("#results").append(`
-            <tr>
-              <td><h3>Name: ${info.profile.last_name}, ${info.profile.first_name}, ${info.profile.title}</h3></td>
-              <td>Phone number: ${info.practices[0].phones[0].number}</td>
-              <td>Address: ${info.practices[0].visit_address.street}, ${info.practices[0].visit_address.city}, ${info.practices[0].visit_address.state}, ${info.practices[0].visit_address.zip}</td>
-              <td>Specialties: ${info.specialties[0].name}</td>
-              <td>Rating: ${info.ratings[0].rating}</li>
-            </tr>
-            `);
-        });
+    let newDoctor = new Doctor();
+    let promise = newDoctor.findDoctorByKey(input);
+
+    promise.then(function (response) {
+      let doctor = JSON.parse(response);
+      if (doctor.data.length != 0) {
+        for (let i = 0; i < doctor.data.length; i++) {
+          $("#output").append("<tr>" +
+            '<td>' + doctor.data[i].profile.first_name + " " + doctor.data[i].profile.last_name + ' (' + doctor.data[i].profile.gender + ')' + '</td>' +
+            '<td>' + doctor.data[i].practices[0].phones[0].number + '</td>' +
+            '<td>' + doctor.data[i].practices[0].visit_address.street + '</td>' +
+            '<td>' + doctor.data[i].practices[0].visit_address.city + "," +
+            doctor.data[i].practices[0].visit_address.state + " " +
+            doctor.data[i].practices[0].visit_address.zip +
+            '</td>' +
+            '<td>' + "Accepting new Patients: " + doctor.data[i].practices[0].accepts_new_patients + '</td>' +
+            "</div>"
+          );
+        }
+        $('#output').dataTable();
       } else {
-        $("#postError").show();
-        $("#postError").text("Your query did not return any doctors. Refresh and try again with a new search parameter.");
+        $("#output").append("<p>" + "No Doctors Meet Criteria" + "</p>");
       }
-      $("#results").DataTable({});
-    };
+    }, function (error) {
+      $("#error").html("<p>"+`There was an Error: ${error.message}`+"</p>");
+    });
+  });
+
+  //click to search by Name
+  $("#byname").click(function () {
+    $("#output").empty();
+    let input = $("#userInput").val();
+    $("#userInput").val("");
+
+    let newDoctor = new Doctor();
+    let namePromise = newDoctor.findDoctorByName(input);
+
+    namePromise.then(function (response) {
+      let doctor = JSON.parse(response);
+      if(doctor.data.length != 0) {
+        for (let i = 0; i < doctor.data.length; i++) {
+          console.log(doctor.data[i].profile.first_name + " " + doctor.data[i].profile.last_name);
+          $("#output").append("<tr>" +
+            '<td>' + doctor.data[i].profile.first_name + " " + doctor.data[i].profile.last_name + '(' + doctor.data[i].profile.gender + ')' + '</td>' +
+            '<td>' + doctor.data[i].practices[0].phones[0].number + '</td>' +
+            '<td>' + doctor.data[i].practices[0].visit_address.street + '</td>' +
+            '<td>' + doctor.data[i].practices[0].visit_address.city + "," +
+            doctor.data[i].practices[0].visit_address.state + " " +
+            doctor.data[i].practices[0].visit_address.zip +
+            '</td>' +
+            '<td>' + "Accepting new Patients: " + doctor.data[i].practices[0].accepts_new_patients + '</td>' +
+            "</div>"
+          );
+        }
+        $('#output').dataTable();
+      } else {
+        $("#output").append("<p>" + "No Doctors Meet Criteria" + "</p>");
+      }
+    }, function (error) {
+      $("#error").html("<p>"+`There was an Error: ${error.message}`+"</p>");
+    });
   });
 });

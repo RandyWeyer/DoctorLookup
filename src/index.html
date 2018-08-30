@@ -3,60 +3,61 @@
 <head>
   <title>Doctor Lookup</title>
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 </head>
 <body>
   <!-- Beginning of navbar -->
-
-  <nav class="navbar navbar-inverse">
-    <div class="container">
-
-      <div>
-        <ul class="nav navbar-nav navbar-left">
-          <li class="active"><a href="index.html">Home</a> </li>
-          </ul>
-
-        </div>
-      </nav>
-
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Find a Doctor</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
       <!-- End of navbar -->
 
       <!-- Beginning of container -->
       <div class="container">
+
         <div class="jumbotron">
           <h1>Doctor Lookup</h1>
         </div>
 
-        <!-- Query form -->
-        <form id="inputForm">
-          <div class="form-group">
-            <label for="name">Search doctors by name:</label>
-            <small>Search by a name keyword: (e.g. 'Lupton')</small>
-            <input class="w-50 form-control" id="name" type="text">
+
+        <h2>Search by Keyword or Doctor name</h2>
+        <br>
+        <input class="form-control" placeholder="Search..." id="userInput">
+        <br>
+        <button class="btn btn-primary" id ="bykeyWord">Search Key Word</button>
+        <button class="btn btn-primary" id ="byname">Search name</button>
+
+        <h2>Search By Specialty</h2>
+        <div>
+          <select id="specialty" class="form-control"></select>
+          <br>
+          <button id ="bySpecialty" class="btn btn-primary">Search Doctors</button>
           </div>
-          <div class="form-group">
-            <label for="query">Search doctors by medical query:</label>
-            <small>Search by a keyword query: (e.g. 'Toothache')</small>
-            <input class="w-50 form-control" id="query" type="text">
-            <br>
-          </div>
-          <button class="btn btn-info" type="submit" name="button">Submit</button>
-        </form>
-        <div id="statusError"></div>
-        <div id="postError"></div>
-        <!-- End of query form -->
+        <div id="error"></div>
+
 
         <!-- Output into a datatable -->
-        <table id="table_id" class="display">
+        <table id="output" class="display">
           <thead>
             <tr>
-              <th>Column 1</th>
-              <th>Column 2</th>
+              <th>Name</th>
+              <th>Phone Number</th>
+              <th>Address</th>
+              <th>Address 2</th>
+              <th>Taking New Patients</th>
             </tr>
           </thead>
-          <tbody id="results">
 
-          </tbody>
         </table>
 
 
